@@ -107,22 +107,34 @@ This project follows strict TDD. All code changes require tests first.
 
 ## Design Philosophy
 
+### Developer Experience is a First-Class Concern
+
+**DX is equal to correctness and performance.** See [ADR-004](docs/architecture/decisions/ADR-004-developer-experience-principles.md) for full principles.
+
+Key principles:
+1. **Explicit over implicit** (pragmatically) - Users should always know what to expect
+2. **Fail fast, fail clearly** - Every error includes what happened, why it matters, and how to fix it
+3. **Progressive disclosure** - Simple things simple, complex things possible
+4. **No surprises** - Behavior matches expectations formed by the API
+5. **Debuggability** - Verbose mode, clear logging, actionable reports
+6. **Graceful degradation** - Partial adoption works, gradual migration supported
+7. **Minimal footprint** - Annotations module has ZERO dependencies
+
 ### No Escape Hatches
 
 There are intentionally NO per-test override markers like `@AllowNetwork`. This is a core design principle.
 
 If a test needs network access, it should be `@MediumTest` or larger. Categories define contracts.
 
-### Fixed Constraints
+### Fixed Time Limits, Configurable Distribution
 
-Time limits, distribution targets, and tolerances are NOT configurable. This ensures:
-- Consistent meaning across all projects
-- No "configuration drift"
-- Alignment with Google's standards
+**Time limits are fixed** (1s/5min/15min) - these define the meaning of test sizes.
+
+**Distribution targets are configurable** (default 80/15/5 with 5% tolerance) - teams can customize for gradual adoption. See [ADR-002](docs/architecture/decisions/ADR-002-distribution-configurability.md).
 
 ### Gradual Adoption
 
-Enforcement modes exist for migration, not permanent bypass:
+Separate enforcement modes for hermeticity and distribution (see [ADR-003](docs/architecture/decisions/ADR-003-enforcement-modes.md)):
 - `OFF` - Initial exploration
 - `WARN` - Migration period (fix violations incrementally)
 - `STRICT` - Production (violations fail builds)
@@ -194,11 +206,12 @@ mvn install -DskipTests
 ## What NOT to Do
 
 1. **Do not add escape hatch markers** - No `@AllowNetwork`, `@AllowFilesystem`, etc.
-2. **Do not make time limits configurable** - They are fixed by design
-3. **Do not make distribution targets configurable** - They are fixed by design
-4. **Do not support JUnit 4** - JUnit 5 only
-5. **Do not support TestNG** - Out of scope for initial release
-6. **Do not add co-authored lines to commits** - Per project standards
+2. **Do not make time limits configurable** - They are fixed by design (defines test size meaning)
+3. **Do not support JUnit 4** - JUnit 5 only
+4. **Do not support TestNG** - Out of scope for initial release
+5. **Do not add co-authored lines to commits** - Per project standards
+6. **Do not sacrifice DX for "purity"** - If it confuses users, find a better way
+7. **Do not ship features without documentation** - Undocumented = doesn't exist
 
 ## Resources
 
